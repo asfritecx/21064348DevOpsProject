@@ -1,0 +1,244 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.9.1.41621",
+      "templateHash": "8873026976790207192"
+    }
+  },
+  "parameters": {
+    "serverName": {
+      "type": "string",
+      "defaultValue": "marvelomysql",
+      "metadata": {
+        "description": "Server Name for Azure database for MySQL"
+      }
+    },
+    "administratorLogin": {
+      "type": "string",
+      "defaultValue": "marveloadmin",
+      "minLength": 1,
+      "metadata": {
+        "description": "Database administrator login name"
+      }
+    },
+    "administratorLoginPassword": {
+      "type": "secureString",
+      "minLength": 8,
+      "metadata": {
+        "description": "Database administrator password"
+      }
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Azure database for MySQL compute capacity in vCores (2,4,8,16,32)"
+      }
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "GP_Gen5_2",
+      "metadata": {
+        "description": "Azure database for MySQL sku name "
+      }
+    },
+    "SkuSizeMB": {
+      "type": "int",
+      "defaultValue": 5120,
+      "metadata": {
+        "description": "Azure database for MySQL Sku Size "
+      }
+    },
+    "SkuTier": {
+      "type": "string",
+      "defaultValue": "GeneralPurpose",
+      "allowedValues": [
+        "Basic",
+        "GeneralPurpose",
+        "MemoryOptimized"
+      ],
+      "metadata": {
+        "description": "Azure database for MySQL pricing tier"
+      }
+    },
+    "skuFamily": {
+      "type": "string",
+      "defaultValue": "Gen5",
+      "metadata": {
+        "description": "Azure database for MySQL sku family"
+      }
+    },
+    "mysqlVersion": {
+      "type": "string",
+      "defaultValue": "8.0",
+      "metadata": {
+        "description": "MySQL version"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "backupRetentionDays": {
+      "type": "int",
+      "defaultValue": 7,
+      "metadata": {
+        "description": "MySQL Server backup retention days"
+      }
+    },
+    "geoRedundantBackup": {
+      "type": "string",
+      "defaultValue": "Disabled",
+      "metadata": {
+        "description": "Geo-Redundant Backup setting"
+      }
+    },
+    "existingVNETName": {
+      "type": "string",
+      "defaultValue": "MarveloVNET",
+      "metadata": {
+        "description": "Existing VNET Name"
+      }
+    },
+    "existingSubnetName": {
+      "type": "string",
+      "defaultValue": "DBSubnet",
+      "metadata": {
+        "description": "Existing Subnet Name"
+      }
+    },
+    "virtualNetworkRuleName": {
+      "type": "string",
+      "defaultValue": "AllowSubnet",
+      "metadata": {
+        "description": "Virtual Network RuleName"
+      }
+    },
+    "privateEndpointName": {
+      "type": "string",
+      "defaultValue": "dbPrivateEP",
+      "metadata": {
+        "description": "Private Endpoint Name"
+      }
+    },
+    "privateDNSZoneName": {
+      "type": "string",
+      "defaultValue": "privatelink.mysql.database.azure.com",
+      "metadata": {
+        "description": "Private DNS Zone Name"
+      }
+    }
+  },
+  "variables": {
+    "pvtEndpointDnsGroupName": "[format('{0}/mydnsgroupname', parameters('privateEndpointName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DBforMySQL/servers",
+      "apiVersion": "2017-12-01",
+      "name": "[parameters('serverName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "tier": "[parameters('SkuTier')]",
+        "capacity": "[parameters('skuCapacity')]",
+        "size": "[format('{0}', parameters('SkuSizeMB'))]",
+        "family": "[parameters('skuFamily')]"
+      },
+      "properties": {
+        "createMode": "Default",
+        "version": "[parameters('mysqlVersion')]",
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+        "minimalTlsVersion": "TLS1_2",
+        "infrastructureEncryption": "Disabled",
+        "publicNetworkAccess": "Disabled",
+        "sslEnforcement": "Enabled",
+        "storageProfile": {
+          "storageMB": "[parameters('SkuSizeMB')]",
+          "backupRetentionDays": "[parameters('backupRetentionDays')]",
+          "geoRedundantBackup": "[parameters('geoRedundantBackup')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2022-01-01",
+      "name": "[parameters('privateEndpointName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "subnet": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('existingVNETName'), parameters('existingSubnetName'))]"
+        },
+        "privateLinkServiceConnections": [
+          {
+            "name": "[parameters('privateEndpointName')]",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.DBforMySQL/servers', parameters('serverName'))]",
+              "groupIds": [
+                "mysqlserver"
+              ]
+            }
+          }
+        ]
+      },
+      "tags": {
+        "Name": "DB Private Endpoint"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DBforMySQL/servers', parameters('serverName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones",
+      "apiVersion": "2018-09-01",
+      "name": "[parameters('privateDNSZoneName')]",
+      "location": "global",
+      "tags": {},
+      "properties": {},
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2020-06-01",
+      "name": "[format('{0}/{1}', parameters('privateDNSZoneName'), format('{0}-link', parameters('privateDNSZoneName')))]",
+      "location": "global",
+      "properties": {
+        "registrationEnabled": false,
+        "virtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('existingVNETName'))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDNSZoneName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2022-01-01",
+      "name": "[variables('pvtEndpointDnsGroupName')]",
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "config1",
+            "properties": {
+              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDNSZoneName'))]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDNSZoneName'))]",
+        "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
+      ]
+    }
+  ]
+}

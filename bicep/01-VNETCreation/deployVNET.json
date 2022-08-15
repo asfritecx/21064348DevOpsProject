@@ -1,0 +1,121 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.9.1.41621",
+      "templateHash": "12425937185038605541"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "japaneast",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "vnetname": {
+      "type": "string",
+      "defaultValue": "MarveloVNET"
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16"
+    },
+    "dbSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24"
+    },
+    "dbSubnetName": {
+      "type": "string",
+      "defaultValue": "DBSubnet"
+    },
+    "jumphostSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.2.0/26"
+    },
+    "jumphostSubnetName": {
+      "type": "string",
+      "defaultValue": "JumphostSubnet"
+    },
+    "appGWSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.200.0/26"
+    },
+    "appGWSubnetName": {
+      "type": "string",
+      "defaultValue": "AppGWSubnet"
+    }
+  },
+  "variables": {
+    "subnets": [
+      {
+        "name": "[parameters('dbSubnetName')]",
+        "subnetPrefix": "[parameters('dbSubnetPrefix')]"
+      },
+      {
+        "name": "[parameters('appGWSubnetName')]",
+        "subnetPrefix": "[parameters('appGWSubnetPrefix')]"
+      },
+      {
+        "name": "[parameters('jumphostSubnetName')]",
+        "subnetPrefix": "[parameters('jumphostSubnetPrefix')]"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2022-01-01",
+      "name": "[parameters('vnetname')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressPrefix')]"
+          ]
+        }
+      }
+    },
+    {
+      "copy": {
+        "name": "Subnets",
+        "count": "[length(variables('subnets'))]",
+        "mode": "serial",
+        "batchSize": 1
+      },
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2022-01-01",
+      "name": "[format('{0}/{1}', parameters('vnetname'), variables('subnets')[copyIndex()].name)]",
+      "properties": {
+        "addressPrefix": "[variables('subnets')[copyIndex()].subnetPrefix]",
+        "privateEndpointNetworkPolicies": "Enabled",
+        "serviceEndpoints": [
+          {
+            "locations": [
+              "[parameters('location')]"
+            ],
+            "service": "Microsoft.Sql"
+          },
+          {
+            "locations": [
+              "[parameters('location')]"
+            ],
+            "service": "Microsoft.Storage"
+          },
+          {
+            "locations": [
+              "[parameters('location')]"
+            ],
+            "service": "Microsoft.Web"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetname'))]"
+      ]
+    }
+  ]
+}

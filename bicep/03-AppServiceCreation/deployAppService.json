@@ -1,0 +1,195 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.9.1.41621",
+      "templateHash": "6331436718812304837"
+    }
+  },
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "defaultValue": "[uniqueString(resourceGroup().id)]"
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "P1v3"
+    },
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "DOCKER|asphyticz/marvelo:68"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "dockerRegistryUrl": {
+      "type": "string",
+      "defaultValue": "https://index.docker.io"
+    },
+    "dockerRegistryUsername": {
+      "type": "string",
+      "defaultValue": "asphyticz"
+    },
+    "subscriptionId": {
+      "type": "string",
+      "defaultValue": "e3cb207f-6802-441b-ba9c-cd52d0c74a35"
+    },
+    "keyVaultRG": {
+      "type": "string",
+      "defaultValue": "keyvaultrg"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "defaultValue": "jason1253634"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "deployAppService",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "webAppName": {
+            "value": "[parameters('webAppName')]"
+          },
+          "sku": {
+            "value": "[parameters('sku')]"
+          },
+          "linuxFxVersion": {
+            "value": "[parameters('linuxFxVersion')]"
+          },
+          "dockerRegistryUrl": {
+            "value": "[parameters('dockerRegistryUrl')]"
+          },
+          "dockerRegistryUsername": {
+            "value": "[parameters('dockerRegistryUsername')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "dockerRegistryPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('keyVaultRG')), 'Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              },
+              "secretName": "DockerAccessToken"
+            }
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.9.1.41621",
+              "templateHash": "208373940274471231"
+            }
+          },
+          "parameters": {
+            "webAppName": {
+              "type": "string",
+              "defaultValue": "[uniqueString(resourceGroup().id)]"
+            },
+            "sku": {
+              "type": "string",
+              "defaultValue": "P1v3"
+            },
+            "linuxFxVersion": {
+              "type": "string",
+              "defaultValue": "DOCKER|asphyticz/marvelo:68"
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "dockerRegistryUrl": {
+              "type": "string",
+              "defaultValue": "https://index.docker.io"
+            },
+            "dockerRegistryUsername": {
+              "type": "string",
+              "defaultValue": "asphyticz"
+            },
+            "dockerRegistryPassword": {
+              "type": "secureString"
+            }
+          },
+          "variables": {
+            "appServicePlanName": "[toLower(format('MarveloASP-{0}', parameters('webAppName')))]",
+            "webSiteName": "[toLower(format('MarveloWeb-{0}', parameters('webAppName')))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2022-03-01",
+              "name": "[variables('appServicePlanName')]",
+              "location": "[parameters('location')]",
+              "tags": {
+                "Name": "Marvelo App Service Plan",
+                "BelongsTo": "App Service"
+              },
+              "sku": {
+                "name": "[parameters('sku')]",
+                "tier": "PremiumV3",
+                "capacity": 1
+              },
+              "kind": "linux",
+              "properties": {
+                "reserved": true,
+                "zoneRedundant": false
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2022-03-01",
+              "name": "[variables('webSiteName')]",
+              "location": "[parameters('location')]",
+              "tags": {
+                "Name": "Marvelo App Service",
+                "BelongsTo": "App Service"
+              },
+              "kind": "app",
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "siteConfig": {
+                  "appSettings": [
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_URL",
+                      "value": "[parameters('dockerRegistryUrl')]"
+                    },
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+                      "value": "[parameters('dockerRegistryUsername')]"
+                    },
+                    {
+                      "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+                      "value": "[parameters('dockerRegistryPassword')]"
+                    },
+                    {
+                      "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                      "value": "false"
+                    }
+                  ],
+                  "linuxFxVersion": "[parameters('linuxFxVersion')]",
+                  "alwaysOn": true
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

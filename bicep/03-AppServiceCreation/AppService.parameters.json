@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetname": {
+      "value": "MarveloVNET"
+    },
+    "appSubnetPrefix": {
+      "value": "10.0.0.0/26"
+    },
+    "appSubnetName": {
+      "value": "AppSubnet"
+    },
+    "sku": {
+      "value": "P1v3"
+    },
+    "linuxFxVersion": {
+      "value": "DOCKER|nopcommerceteam/nopcommerce:latest"
+    },
+    "dockerRegistryUrl": {
+      "value": "https://index.docker.io"
+    },
+    "dockerRegistryUsername": {
+      "value": "asphyticz"
+    }
+  }
+}

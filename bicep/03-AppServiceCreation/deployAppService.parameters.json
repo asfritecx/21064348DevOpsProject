@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sku": {
+      "value": "P1v3"
+    },
+    "linuxFxVersion": {
+      "value": "DOCKER|asphyticz/marvelo:68"
+    },
+    "dockerRegistryUrl": {
+      "value": "https://index.docker.io"
+    },
+    "dockerRegistryUsername": {
+      "value": "asphyticz"
+    },
+    "subscriptionId": {
+      "value": "e3cb207f-6802-441b-ba9c-cd52d0c74a35"
+    },
+    "keyVaultRG": {
+      "value": "keyvaultrg"
+    },
+    "keyVaultName": {
+      "value": "jason1253634"
+    }
+  }
+}

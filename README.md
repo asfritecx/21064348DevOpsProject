@@ -1,4 +1,4 @@
-﻿This Public Repository is for my Final Project for DevOps For RP
+﻿This Public Repository is for my Final Project for Cloud Management For RP
 ===========
 
 The project utilizes Docker Containers running on Azure App Services along with a Azure MySQL Database.

@@ -1,20 +1,21 @@
 param location string = 'japaneast'
 
-@description('Adminstrator login password for MarveloMYSQLDatabase')
+@description('MarveloMYSQLDatabase Admin Password')
 @secure()
 param administratorLoginPassword string 
 
-@description('Docker Login Password for Asphyticz Account')
+@description('Docker Password for Asphyticz Account')
 @secure()
 param dockerRegistryPassword string 
 
-@description('VM UserName')
+ @description('JumphostVM UserName')
 @secure()
 param jumphostVMUsername string
 
-@description('VM Password')
+@description('JumphostVM Password')
 @secure()
 param jumphostVMPassword string 
+
 //Deploys the Virtual Network by referencing the local bicep file
 module DeployVNET '01-VNETCreation/deployVNET.bicep' = {
   name: 'DeployMarveloVNET'
@@ -47,7 +48,7 @@ module DeployAppService '03-AppServiceCreation/AppService.bicep' = {
 }
 
 //Uncomment if need to use Bastion
-/* module DeployBastionService '04-BastionVMCreation/bastionDeploy.bicep' = {
+module DeployBastionService '04-BastionVMCreation/bastionDeploy.bicep' = {
   name: 'DeployBastionService'
   params: {
     location: location
@@ -58,4 +59,4 @@ module DeployAppService '03-AppServiceCreation/AppService.bicep' = {
     DeployVNET
     DeployAppService
   ]
-} */
+} 

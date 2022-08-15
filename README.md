@@ -8,5 +8,8 @@ How to Use:
 2. Login To Azure Account
 3. Run deployAll.Bicep
 
+Optional:
+Change json.Parameter files As needed.
+
 
 

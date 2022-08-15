@@ -22,5 +22,8 @@ How to Use:
 Optional:
 Change json.Parameter files As needed.
 
+- Storing this in a git repository so that I can refer to it in the future.
+- I am planning to explore other IaC options to learn and do during my free time.
+
 
 

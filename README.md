@@ -1,5 +1,16 @@
-﻿This Public Repository is for my Final Project for DevOps 
+﻿This Public Repository is for my Final Project for DevOps For RP
 ===========
+
+The project utilizes Docker Containers running on Azure App Services along with a Azure MySQL Database.
+
+The requirements of the project are:
+- Cost Should be Kept Low
+- Use Of Managed Services whenever possible
+- Highly Available
+- Scalability
+- Ease of deployment
+- Ease of Manageability
+
 
 Deploys the Azure Infrastructures required for the project.
 

@@ -1,8 +1,9 @@
 // Bicep taken from https://docs.microsoft.com/en-us/azure/mysql/quickstart-create-mysql-server-database-using-bicep?tabs=PowerShell
 // Slight modifications done to suite project needs
 
+param uniquedbstring string = uniqueString(resourceGroup().id)
 @description('Server Name for Azure database for MySQL')
-param serverName string = 'marvelomysql'
+param serverName string = toLower('marvelomysql-${uniquedbstring}')
 
 @description('Database administrator login name')
 @minLength(1)

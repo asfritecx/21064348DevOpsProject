@@ -1,6 +1,6 @@
 param location string = 'japaneast'
 
-@description('MarveloMYSQLDatabase Admin Password')
+@description('Database Login Password')
 @secure()
 param administratorLoginPassword string 
 
@@ -8,7 +8,7 @@ param administratorLoginPassword string
 @secure()
 param dockerRegistryPassword string 
 
- @description('JumphostVM UserName')
+@description('JumphostVM UserName')
 @secure()
 param jumphostVMUsername string
 

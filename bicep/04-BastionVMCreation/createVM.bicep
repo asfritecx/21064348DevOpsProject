@@ -9,14 +9,14 @@ param adminUsername string
 @secure()
 param adminPassword string
 
-@description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
-param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id, vmName)}')
+/* @description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
+param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id, vmName)}') */
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version.')
 @allowed([
-'2022-datacenter'
-'2022-datacenter-azure-edition'
-'2022-datacenter-azure-edition-core'
+  '2022-datacenter'
+  '2022-datacenter-azure-edition'
+  '2022-datacenter-azure-edition-core'
 ])
 param OSVersion string = '2022-datacenter'
 
@@ -69,7 +69,7 @@ resource securityGroup 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
       }
     ]
   }
-} 
+}
 
 //Reference Existing VNET
 resource MarveloVNET 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {

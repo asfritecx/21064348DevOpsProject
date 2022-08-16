@@ -2,7 +2,7 @@ param location string = 'japaneast'
 
 @description('Database Login Password')
 @secure()
-param administratorLoginPassword string 
+param dbLoginPwd string 
 
 @description('Docker Password for Asphyticz Account')
 @secure()
@@ -16,6 +16,16 @@ param jumphostVMUsername string
 @secure()
 param jumphostVMPassword string 
 
+@description('Registry URL To Pull From')
+param dockerRegistryUrl string = 'https://index.docker.io'
+
+@description('Registry Login Username')
+param dockerRegistryUsername string = 'asphyticz'
+
+@description('Image to Pull From Repository')
+param imageToPull string = 'nopcommerceteam/nopcommerce:latest'
+var linuxFxVersion  = 'DOCKER|${imageToPull}'
+
 //Deploys the Virtual Network by referencing the local bicep file
 module DeployVNET '01-VNETCreation/deployVNET.bicep' = {
   name: 'DeployMarveloVNET'
@@ -28,7 +38,7 @@ module DeployMYSQLDatabase '02-MySQLCreation/deployMYSQL.bicep' = {
   name: 'DeployMYSQLDatabase'
   params: {
     location: location
-    administratorLoginPassword: administratorLoginPassword
+    dbLoginPwd: dbLoginPwd
   }
   dependsOn: [
     DeployVNET
@@ -39,6 +49,9 @@ module DeployAppService '03-AppServiceCreation/AppService.bicep' = {
   name: 'DeployAppService'
   params: {
     location: location
+    dockerRegistryUrl: dockerRegistryUrl
+    dockerRegistryUsername: dockerRegistryUsername
+    linuxFxVersion: linuxFxVersion
     dockerRegistryPassword: dockerRegistryPassword
   }
   dependsOn: [

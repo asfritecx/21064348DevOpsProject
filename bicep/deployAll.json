@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.9.1.41621",
-      "templateHash": "11863362899624570511"
+      "templateHash": "5553264519547430891"
     }
   },
   "parameters": {
@@ -16,25 +16,25 @@
     "administratorLoginPassword": {
       "type": "secureString",
       "metadata": {
-        "description": "Adminstrator login password for MarveloMYSQLDatabase"
+        "description": "Database Login Password"
       }
     },
     "dockerRegistryPassword": {
       "type": "secureString",
       "metadata": {
-        "description": "Adminstrator login password for MarveloMYSQLDatabase"
+        "description": "Docker Password for Asphyticz Account"
       }
     },
-    "adminUsername": {
+    "jumphostVMUsername": {
       "type": "secureString",
       "metadata": {
-        "description": "Adminstrator login password for MarveloMYSQLDatabase"
+        "description": "JumphostVM UserName"
       }
     },
-    "adminPassword": {
+    "jumphostVMPassword": {
       "type": "secureString",
       "metadata": {
-        "description": "Adminstrator login password for MarveloMYSQLDatabase"
+        "description": "JumphostVM Password"
       }
     }
   },
@@ -430,7 +430,10 @@
             }
           ]
         }
-      }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'DeployMarveloVNET')]"
+      ]
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -614,7 +617,11 @@
             }
           ]
         }
-      }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'DeployMYSQLDatabase')]",
+        "[resourceId('Microsoft.Resources/deployments', 'DeployMarveloVNET')]"
+      ]
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -630,10 +637,10 @@
             "value": "[parameters('location')]"
           },
           "adminPassword": {
-            "value": "[parameters('adminPassword')]"
+            "value": "[parameters('jumphostVMPassword')]"
           },
           "adminUsername": {
-            "value": "[parameters('adminUsername')]"
+            "value": "[parameters('jumphostVMUsername')]"
           }
         },
         "template": {
@@ -643,7 +650,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.9.1.41621",
-              "templateHash": "3471385447574020098"
+              "templateHash": "12484693495548642323"
             }
           },
           "parameters": {
@@ -799,7 +806,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.9.1.41621",
-                      "templateHash": "17913581729436184434"
+                      "templateHash": "5233649524783284852"
                     }
                   },
                   "parameters": {
@@ -814,13 +821,6 @@
                       "minLength": 12,
                       "metadata": {
                         "description": "Password for the Virtual Machine."
-                      }
-                    },
-                    "dnsLabelPrefix": {
-                      "type": "string",
-                      "defaultValue": "[toLower(format('{0}-{1}', parameters('vmName'), uniqueString(resourceGroup().id, parameters('vmName'))))]",
-                      "metadata": {
-                        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
                       }
                     },
                     "OSVersion": {
@@ -992,7 +992,11 @@
             }
           ]
         }
-      }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'DeployAppService')]",
+        "[resourceId('Microsoft.Resources/deployments', 'DeployMarveloVNET')]"
+      ]
     }
   ]
 }

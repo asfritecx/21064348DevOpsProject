@@ -11,7 +11,7 @@ param administratorLogin string = 'marveloadmin'
 @description('Database administrator password')
 @minLength(8)
 @secure()
-param administratorLoginPassword string
+param dbLoginPwd string
 
 @description('Azure database for MySQL compute capacity in vCores (2,4,8,16,32)')
 param skuCapacity int = 2
@@ -76,7 +76,7 @@ resource mysqlDbServer 'Microsoft.DBforMySQL/servers@2017-12-01' = {
     createMode: 'Default'
     version: mysqlVersion
     administratorLogin: administratorLogin
-    administratorLoginPassword: administratorLoginPassword
+    administratorLoginPassword: dbLoginPwd
     minimalTlsVersion: 'TLS1_2'
     infrastructureEncryption:'Disabled'
     publicNetworkAccess: 'Disabled'

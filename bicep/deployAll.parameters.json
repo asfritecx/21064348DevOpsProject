@@ -12,7 +12,10 @@
       "value": "asphyticz"
     },
     "imageToPull": {
-      "value": "asphyticz/marvelo:68"
+      "value": "asphyticz/marvelo:78"
+    },
+    "jumphostVMUsername":{
+      "value": "marveloadmin"
     }
   }
 }

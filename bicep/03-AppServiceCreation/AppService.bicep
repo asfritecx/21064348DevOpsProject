@@ -7,6 +7,7 @@ param dockerRegistryUsername string = 'asphyticz'
 param vnetname string = 'MarveloVNET'
 param appSubnetPrefix string = '10.0.0.0/26'
 param appSubnetName string = 'AppSubnet'
+param appServiceKind string = 'app,linux,container'
 
 @secure()
 param dockerRegistryPassword string
@@ -42,7 +43,7 @@ resource appService 'Microsoft.Web/sites@2022-03-01' = {
     Name: 'Marvelo App Service'
     BelongsTo: 'App Service'
   }
-  kind: 'app'
+  kind: appServiceKind
   identity: {
     type:'SystemAssigned'
   }
@@ -50,6 +51,7 @@ resource appService 'Microsoft.Web/sites@2022-03-01' = {
     serverFarmId: appServicePlan.id
     virtualNetworkSubnetId: appSubnet.id
     siteConfig: {
+      localMySqlEnabled:false
       appSettings: [
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'

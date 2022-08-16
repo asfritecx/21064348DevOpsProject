@@ -1,31 +1,5 @@
 param location string = 'japaneast'
 
-@description('Database Login Password')
-@secure()
-param dbLoginPwd string 
-
-@description('Docker Password for Asphyticz Account')
-@secure()
-param dockerRegistryPassword string 
-
-@description('JumphostVM UserName')
-@secure()
-param jumphostVMUsername string
-
-@description('JumphostVM Password')
-@secure()
-param jumphostVMPassword string 
-
-@description('Registry URL To Pull From')
-param dockerRegistryUrl string = 'https://index.docker.io'
-
-@description('Registry Login Username')
-param dockerRegistryUsername string = 'asphyticz'
-
-@description('Image to Pull From Repository')
-param imageToPull string = 'nopcommerceteam/nopcommerce:latest'
-var linuxFxVersion  = 'DOCKER|${imageToPull}'
-
 //Deploys the Virtual Network by referencing the local bicep file
 module DeployVNET '01-VNETCreation/deployVNET.bicep' = {
   name: 'DeployMarveloVNET'
@@ -33,6 +7,12 @@ module DeployVNET '01-VNETCreation/deployVNET.bicep' = {
     location: location
   }
 }
+
+
+@description('Database Login Password')
+@secure()
+param dbLoginPwd string 
+
 //Deploys the MySQL Database by referencing the local bicep file
 module DeployMYSQLDatabase '02-MySQLCreation/deployMYSQL.bicep' = {
   name: 'DeployMYSQLDatabase'
@@ -44,6 +24,22 @@ module DeployMYSQLDatabase '02-MySQLCreation/deployMYSQL.bicep' = {
     DeployVNET
   ]
 }
+
+
+@description('Docker Password for Asphyticz Account')
+@secure()
+param dockerRegistryPassword string 
+
+@description('Registry URL To Pull From')
+param dockerRegistryUrl string
+
+@description('Registry Login Username')
+param dockerRegistryUsername string 
+
+@description('Image to Pull From Repository')
+param imageToPull string 
+var linuxFxVersion  = 'DOCKER|${imageToPull}'
+
 //Deploys the AppService by referencing the local bicep file
 module DeployAppService '03-AppServiceCreation/AppService.bicep' = {
   name: 'DeployAppService'
@@ -56,11 +52,19 @@ module DeployAppService '03-AppServiceCreation/AppService.bicep' = {
   }
   dependsOn: [
     DeployVNET
-    DeployMYSQLDatabase
+    //DeployMYSQLDatabase
   ]
 }
 
+
 //Uncomment if need to use Bastion
+@description('JumphostVM UserName')
+param jumphostVMUsername string
+
+@description('JumphostVM Password')
+@secure()
+param jumphostVMPassword string 
+
 module DeployBastionService '04-BastionVMCreation/bastionDeploy.bicep' = {
   name: 'DeployBastionService'
   params: {
@@ -73,3 +77,4 @@ module DeployBastionService '04-BastionVMCreation/bastionDeploy.bicep' = {
     DeployAppService
   ]
 } 
+

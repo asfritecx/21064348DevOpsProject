@@ -6,7 +6,7 @@ param serverName string = 'marvelomysql'
 
 @description('Database administrator login name')
 @minLength(1)
-param administratorLogin string = 'marveloadmin'
+param dbLoginName string = 'marveloadmin'
 
 @description('Database administrator password')
 @minLength(8)
@@ -75,7 +75,7 @@ resource mysqlDbServer 'Microsoft.DBforMySQL/servers@2017-12-01' = {
   properties: {
     createMode: 'Default'
     version: mysqlVersion
-    administratorLogin: administratorLogin
+    administratorLogin: dbLoginName
     administratorLoginPassword: dbLoginPwd
     minimalTlsVersion: 'TLS1_2'
     infrastructureEncryption:'Disabled'

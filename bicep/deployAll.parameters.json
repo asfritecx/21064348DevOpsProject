@@ -4,6 +4,15 @@
   "parameters": {
     "location": {
       "value": "japaneast"
+    },
+    "dockerRegistryUrl": {
+      "value": "https://index.docker.io"
+    },
+    "dockerRegistryUsername": {
+      "value": "asphyticz"
+    },
+    "imageToPull": {
+      "value": "asphyticz/marvelo:68"
     }
   }
 }
